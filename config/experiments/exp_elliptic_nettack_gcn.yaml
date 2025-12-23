@@ -1,0 +1,12 @@
+dataset: elliptic
+model:
+  name: gcn
+  hidden_dim: 64
+
+training:
+  epochs: 200
+  lr: 0.01
+
+attack:
+  name: nettack
+  n_perturbations: 5
