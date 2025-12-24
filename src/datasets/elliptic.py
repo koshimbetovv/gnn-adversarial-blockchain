@@ -2,7 +2,7 @@ import torch
 from torch_geometric.data import Data
 
 class EllipticDataset:
-    def __init__(self, root="../data/processed/elliptic"):
+    def __init__(self, root="data/processed/elliptic"):
         obj = torch.load(f"{root}/data.pt")
 
         self.data = Data(

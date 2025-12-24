@@ -1,10 +1,10 @@
 import yaml
 import torch
-from src.datasets.elliptic import EllipticDataset
-from src.models.gcn import GCN
-from src.training.trainer import Trainer
-from src.training.evaluator import evaluate
-from src.attacks.nettack_local import NettackLocalAttack
+from datasets.elliptic import EllipticDataset
+from models.gcn import GCN
+from training.trainer import Trainer
+from training.evaluator import evaluate
+from attacks.nettack_local import NettackLocalAttack
 
 def main(cfg):
     if torch.cuda.is_available():
@@ -28,7 +28,14 @@ def main(cfg):
 
     acc_clean = evaluate(model, data)
 
-    attack = NettackLocalAttack(model, data, device)
+    from collections import defaultdict
+
+    adj_list = defaultdict(set)
+    for u, v in data.edge_index.t().tolist():
+        adj_list[u].add(v)
+        adj_list[v].add(u)
+
+    attack = NettackLocalAttack(model, data, adj_list, device)
     edge_index_adv = attack.attack(target_node=0, edge_index=data.edge_index)
 
     data.edge_index = edge_index_adv

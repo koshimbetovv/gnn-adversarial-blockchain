@@ -1,6 +1,6 @@
 import torch
 import torch.nn.functional as F
-from src.attacks.base_attack import BaseAttack
+from attacks.base_attack import BaseAttack
 from src.utils.graph_utils import edge_index_to_adj
 
 class NettackStructuralAttack(BaseAttack):

@@ -1,5 +1,6 @@
 import torch
 import torch.nn.functional as F
+from tqdm import tqdm
 
 class Trainer:
     def __init__(self, model, data, device):
@@ -10,7 +11,7 @@ class Trainer:
     def train(self, epochs=200, lr=0.01):
         opt = torch.optim.Adam(self.model.parameters(), lr=lr)
 
-        for _ in range(epochs):
+        for _ in tqdm(range(epochs)):
             self.model.train()
             opt.zero_grad()
             out = self.model(self.data.x, self.data.edge_index)

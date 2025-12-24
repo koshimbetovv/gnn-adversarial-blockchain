@@ -1,7 +1,7 @@
 import random
 import torch
 import torch.nn.functional as F
-from src.attacks.base_attack import BaseAttack
+from attacks.base_attack import BaseAttack
 
 class NettackLocalAttack(BaseAttack):
     def __init__(self, model, data, adj_list, device):
