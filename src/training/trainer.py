@@ -11,7 +11,7 @@ class Trainer:
     def train(self, epochs=200, lr=0.01):
         opt = torch.optim.Adam(self.model.parameters(), lr=lr)
 
-        for _ in tqdm(range(epochs)):
+        for _ in tqdm(range(epochs), desc="Training:"):
             self.model.train()
             opt.zero_grad()
             out = self.model(self.data.x, self.data.edge_index)

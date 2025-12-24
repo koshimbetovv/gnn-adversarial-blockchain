@@ -2,6 +2,7 @@ import random
 import torch
 import torch.nn.functional as F
 from attacks.base_attack import BaseAttack
+from tqdm import tqdm
 
 class NettackLocalAttack(BaseAttack):
     def __init__(self, model, data, adj_list, device):
@@ -13,7 +14,7 @@ class NettackLocalAttack(BaseAttack):
     def attack(self, target_node, edge_index, n_perturbations=5, sample_size=100):
         edge_set = set(map(tuple, edge_index.t().tolist()))
 
-        for _ in range(n_perturbations):
+        for _ in tqdm(range(n_perturbations), desc="Attacking | Perturbations:"):
             neighbors = self.adj_list[target_node]
             all_nodes = set(range(self.data.num_nodes))
             non_neighbors = list(all_nodes - neighbors - {target_node})
