@@ -7,7 +7,7 @@ This document explains what each folder/file is for, and which pieces are inputs
 ## High-level tree
 
 ```
-gnn-adversarial-blockchain-gpt/
+gnn-adversarial-blockchain/
 ├── README.md
 ├── filesystem.md
 ├── requirements.txt
