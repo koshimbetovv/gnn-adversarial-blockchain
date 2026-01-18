@@ -8,8 +8,13 @@ class EllipticDataset:
         self.data = Data(
             x=obj["x"],
             edge_index=obj["edge_index"],
-            y=obj["y"]
+            y=obj["y"],
         )
+
+        # attach masks if present
+        for k in ["train_mask", "test_mask"]:
+            if k in obj:
+                setattr(self.data, k, obj[k])
 
     def get_data(self):
         return self.data

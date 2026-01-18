@@ -2,6 +2,8 @@ import yaml
 import torch
 from datasets.elliptic import EllipticDataset
 from models.gcn import GCN
+from models.gat import GAT
+from models.graphsage import GraphSAGE
 from training.trainer import Trainer
 from training.evaluator import evaluate
 from attacks.nettack_local import NettackLocalAttack

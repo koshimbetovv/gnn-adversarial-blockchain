@@ -1,0 +1,45 @@
+{
+  "test": {
+    "split": "test",
+    "n_labeled": 8841,
+    "acc": 0.9466123741658183,
+    "precision_pos": 0.4276018099547511,
+    "recall_pos": 0.4632352941176471,
+    "f1_pos": 0.4447058823529412,
+    "precision_macro": 0.7007636386361444,
+    "recall_macro": 0.716617054150013,
+    "f1_macro": 0.7083320286289421,
+    "fraud_predictions": 442,
+    "confusion_matrix_2x2": [
+      [
+        8180,
+        253
+      ],
+      [
+        219,
+        189
+      ]
+    ]
+  },
+  "config": {
+    "model": {
+      "hidden_dim": 128,
+      "num_layers": 2,
+      "dropout": 0.6,
+      "out_dim": 2
+    },
+    "training": {
+      "epochs": 1000,
+      "lr": 0.005,
+      "weight_decay": 0.0005,
+      "grad_clip": 1.0,
+      "adam_eps": 1e-05,
+      "log_every": 50
+    },
+    "save": {
+      "save_dir": "models",
+      "save_run": true,
+      "filename": "gcn.pt"
+    }
+  }
+}

@@ -1,0 +1,14 @@
+name: GCN
+description: Graph Convolutional Network for fraud detection
+
+# Model architecture
+model:
+  hidden_dim: 64
+  num_layers: 2
+  dropout: 0.6
+
+# Training hyperparameters
+training:
+  epochs: 200
+  lr: 0.01
+  weight_decay: 0.0005
