@@ -1,9 +1,20 @@
+# Core DL + Graph learning
+# NOTE: torch-geometric may require platform-specific wheels (torch-scatter/torch-sparse/torch-cluster/torch-spline-conv).
+# If installation fails, follow the official PyG install instructions for your PyTorch + CUDA/MPS setup.
+
 torch
 torch-geometric
+
+# Scientific Python stack
 numpy
 pandas
 scikit-learn
+scipy
+
+# Utilities
 tqdm
 pyyaml
 networkx
-scipy
+
+# Plotting (used by scripts/evaluate_models.py)
+matplotlib
