@@ -1,6 +1,4 @@
 data/raw/
-data/processed/
-data/
 /experiments/
 __pycache__/
 *.pt
