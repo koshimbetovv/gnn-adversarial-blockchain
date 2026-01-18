@@ -1,5 +1,4 @@
-data/raw/
-/experiments/
+
 __pycache__/
 *.pt
 *.log
@@ -8,3 +7,4 @@ __pycache__/
 .DS_Store
 results/
 __MACOSX/
+data/
