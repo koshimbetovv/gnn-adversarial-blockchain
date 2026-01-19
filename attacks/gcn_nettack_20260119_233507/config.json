@@ -1,0 +1,23 @@
+{
+  "timestamp": "20260119_233507",
+  "attack": "NettackLocal",
+  "model_name": "gcn",
+  "split": "test",
+  "device": "mps",
+  "attack_params": {
+    "n_perturbations": 3,
+    "sample_size": 50,
+    "undirected": false,
+    "allow_removals": false,
+    "attack_incoming": true,
+    "early_stop": true,
+    "seed": 0
+  },
+  "target_selection": {
+    "attack_only_illicit": false,
+    "attack_fraction": 0.0005,
+    "only_clean_correct": true,
+    "max_targets": null,
+    "n_targets": 4
+  }
+}

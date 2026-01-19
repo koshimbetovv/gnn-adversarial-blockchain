@@ -104,6 +104,7 @@ class NettackLocalAttack(BaseAttack):
         sample_size: int = 200,
         include_neighbors: bool = True,
         early_stop: bool = True,   # <<< NEW
+        show_progress: bool = False
     ) -> torch.Tensor:
         edge_set: set[tuple[int, int]] = set(map(tuple, edge_index.t().tolist()))
         adj = self.adj_list if self.adj_list is not None else self._build_adj_list(edge_index)
@@ -113,8 +114,11 @@ class NettackLocalAttack(BaseAttack):
         all_nodes = set(range(self.data.num_nodes))
         y_t = int(self.y[target_node].item())
 
-        pbar = tqdm(total=int(n_perturbations), desc=f"Attacking t={target_node}", leave=True)
-        for step in range(int(n_perturbations)):
+        itr = range(int(n_perturbations))
+        if show_progress:
+            itr = tqdm(itr, desc=f"Perturbations t={target_node}", leave=False)
+
+        for step in itr:
             neighbors = set(adj[target_node])
             non_neighbors = list(all_nodes - neighbors - {target_node})
             sampled_non = self.rng.sample(non_neighbors, k=min(sample_size, len(non_neighbors)))
@@ -131,13 +135,14 @@ class NettackLocalAttack(BaseAttack):
                     if e in edge_set:
                         candidates.append(("remove", u))
 
-            pbar.set_postfix(neigh=len(neighbors), cand=len(candidates))
+            if show_progress:itr.set_postfix(neigh=len(neighbors), cand=len(candidates))
 
             if not candidates:
-                pbar.set_postfix(neigh=len(neighbors), cand=0, reason="no_candidates")
-                # finish bar visually
-                pbar.n = pbar.total
-                pbar.refresh()
+                if show_progress:
+                    itr.set_postfix(neigh=len(neighbors), cand=0, reason="no_candidates")
+                    # finish bar visually
+                    itr.n = itr.total
+                    itr.refresh()
                 break
 
             best_loss = float("-inf")
@@ -162,9 +167,10 @@ class NettackLocalAttack(BaseAttack):
                     best_pred = pred_val
 
             if best_op is None:
-                pbar.set_postfix(reason="no_best_op")
-                pbar.n = pbar.total
-                pbar.refresh()
+                if show_progress:
+                    itr.set_postfix(reason="no_best_op")
+                    itr.n = itr.total
+                    itr.refresh()
                 break
 
             op, u = best_op
@@ -176,14 +182,15 @@ class NettackLocalAttack(BaseAttack):
                 self._remove_edge_set(edge_set, e)
                 self._update_adj_remove(adj, e)
 
-            pbar.update(1)
+            if show_progress: itr.update(1)
 
             if early_stop and best_pred is not None and best_pred != y_t:
-                pbar.set_postfix(neigh=len(neighbors), cand=len(candidates), flipped=1, step=step+1)
-                pbar.n = pbar.total
-                pbar.refresh()
+                if show_progress:
+                    itr.set_postfix(neigh=len(neighbors), cand=len(candidates), flipped=1, step=step+1)
+                    itr.n = itr.total
+                    itr.refresh()
                 break
 
-        pbar.close()
+        if show_progress: itr.close()
 
         return torch.tensor(list(edge_set), dtype=torch.long).t().contiguous().to(self.device)

@@ -1,6 +1,8 @@
 import os
 import sys
 import torch
+import json
+from datetime import datetime
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
@@ -34,6 +36,18 @@ def get_device():
     if torch.cuda.is_available(): return torch.device("cuda")
     if torch.backends.mps.is_available(): return torch.device("mps")
     return torch.device("cpu")
+
+def make_run_dir(model_name: str):
+    """Create attacks/model_YYYYMMDD_HHMMSS/ under repo root and return (run_dir, timestamp)."""
+    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+    run_dir = os.path.join(repo_root, "attacks", f"{model_name}_fgsm_{ts}")
+    os.makedirs(run_dir, exist_ok=False)
+    return run_dir, ts
+
+def write_json(path: str, obj: dict):
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(obj, f, indent=2, ensure_ascii=False)
 
 def main():
     device = get_device()
@@ -82,6 +96,7 @@ def main():
 
     asr_p, sp, ap, asr_n, sn, an = asr_pos_neg(data.y, logits_clean, logits_adv, attack_mask)
 
+    print()
     print(f"FGSM | eps={EPS} | TARGETED={TARGETED} | TARGET_LABEL={TARGET_LABEL}")
 
     print(f"ASR={asr:.6f} ({ns}/{na})")
@@ -91,6 +106,58 @@ def main():
 
     print(f"ROC-AUC (split): {roc_clean:.6f} -> {roc_adv:.6f}")
     print(f"Mean confidence drop (attacked, clean-correct): {conf_drop:.6f} over n={n_used}")
+
+
+    run_dir, ts = make_run_dir(MODEL_NAME)
+    config = {
+        "timestamp": ts,
+        "attack": "FGSM",
+        "model_name": MODEL_NAME,
+        "split": SPLIT,
+        "device": str(device),
+        "attack_params": {
+            "eps": EPS,
+            "targeted": TARGETED,
+            "target_label": TARGET_LABEL,
+            "clamp": CLAMP,
+        },
+        "target_selection": {
+            "attack_only_illicit": ATTACK_ONLY_ILLICIT,
+            "attack_fraction": ATTACK_FRACTION,
+            "only_clean_correct": ONLY_CLEAN_CORRECT,
+            "seed": SEED,
+            "n_targets": int(targets.numel()),
+        },
+    }
+    write_json(os.path.join(run_dir, "config.json"), config)
+
+    metrics = {
+        "attack": "FGSM",
+        "model_name": MODEL_NAME,
+        "split": SPLIT,
+        "n_targets": int(targets.numel()),
+        "attack_mask_n": int(attack_mask.sum().item()),
+        "asr": {"value": asr, "success": ns, "attempted": na},
+        "asr_pos_neg": {
+            "asr_pos": asr_p, "succ_pos": sp, "attempted_pos": ap,
+            "asr_neg": asr_n, "succ_neg": sn, "attempted_neg": an,
+        },
+        "f1": {
+            "pos_clean": clean_m.f1_pos,
+            "pos_adv": adv_m.f1_pos,
+            "macro_clean": clean_m.f1_macro,
+            "macro_adv": adv_m.f1_macro,
+        },
+        "roc_auc": {"clean": roc_clean, "adv": roc_adv},
+        "mean_confidence_drop": {"value": conf_drop, "n": n_used},
+        "clean_split_metrics": vars(clean_m),
+        "adv_split_metrics": vars(adv_m),
+    }
+    write_json(os.path.join(run_dir, "metrics.json"), metrics)
+
+    print()
+    print(f"Saved to attacks/")
+
 
 
 if __name__ == "__main__":

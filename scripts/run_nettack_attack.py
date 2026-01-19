@@ -3,7 +3,9 @@ import sys
 from collections import defaultdict
 import torch
 import torch.nn.functional as F
-
+from tqdm import tqdm
+import json
+from datetime import datetime
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
@@ -25,8 +27,8 @@ EARLY_STOP = True
 SEED = 0
 
 # ---------- target selection controls ----------
-ATTACK_ONLY_ILLICIT = True
-ATTACK_FRACTION = 0.02  # Between 0 and 1.0
+ATTACK_ONLY_ILLICIT = False
+ATTACK_FRACTION = 0.0005  # Between 0 and 1.0
 
 # Recommended for meaningful ASR (correct->wrong). You can still set False to sample broader targets.
 ONLY_CLEAN_CORRECT = True
@@ -44,6 +46,19 @@ def build_adj_list(edge_index, undirected):
         if undirected:
             adj[v].add(u)
     return adj
+
+def make_run_dir(model_name: str):
+    """Create attacks/model_YYYYMMDD_HHMMSS/ under repo root and return (run_dir, timestamp)."""
+    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+    run_dir = os.path.join(repo_root, "attacks", f"{model_name}_nettack_{ts}")
+    os.makedirs(run_dir, exist_ok=False)
+    return run_dir, ts
+
+def write_json(path: str, obj: dict):
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(obj, f, indent=2, ensure_ascii=False)
+
 
 def main():
     device = get_device()
@@ -94,14 +109,18 @@ def main():
     attempted = 0  # only clean-correct targets count as 'attempted' for ASR
     conf_drop_sum = 0.0
     conf_n = 0
-    for t in targets.tolist():
+
+    pbar = tqdm(targets.tolist(), desc="Attacking targets", total=int(targets.numel()))
+    for t in pbar:
         is_clean_correct = bool(int(y_pred_clean[t].item()) == int(data.y[t].item()))
+
         edge_adv = atk.attack(
         t,
         edge_index_base,
         n_perturbations=N_PERTURBATIONS,
         sample_size=SAMPLE_SIZE,
-        early_stop=EARLY_STOP,   # <<< add
+        early_stop=EARLY_STOP,  
+        show_progress=False
         )
 
 
@@ -112,6 +131,8 @@ def main():
             attempted += 1
             if pred_adv != int(data.y[t].item()):
                 success += 1
+
+        pbar.set_postfix(success=success, attempted=attempted)
 
         with torch.no_grad():
             true_y = int(data.y[t].item())
@@ -127,12 +148,56 @@ def main():
 
     asr = (success / attempted) if attempted > 0 else 0.0
     mean_drop = (conf_drop_sum / conf_n) if conf_n > 0 else 0.0
+    print()
     print(
         f"Nettack-Local | k={N_PERTURBATIONS} | only_illicit={ATTACK_ONLY_ILLICIT} | "
         f"frac={ATTACK_FRACTION} | n_targets={int(targets.numel())} | attempted(clean-correct)={attempted}"
     )
     print(f"ASR={asr:.6f} ({success}/{attempted})")
     print(f"Mean confidence drop (clean-correct targets): {mean_drop:.6f} over n={conf_n}")
+
+    # Save config and metrics
+    run_dir, ts = make_run_dir(MODEL_NAME)
+    config = {
+        "timestamp": ts,
+        "attack": "NettackLocal",
+        "model_name": MODEL_NAME,
+        "split": SPLIT,
+        "device": str(device),
+        "attack_params": {
+            "n_perturbations": N_PERTURBATIONS,
+            "sample_size": SAMPLE_SIZE,
+            "undirected": UNDIRECTED,
+            "allow_removals": ALLOW_REMOVALS,
+            "attack_incoming": ATTACK_INCOMING,
+            "early_stop": EARLY_STOP,
+            "seed": SEED,
+        },
+        "target_selection": {
+            "attack_only_illicit": ATTACK_ONLY_ILLICIT,
+            "attack_fraction": ATTACK_FRACTION,
+            "only_clean_correct": ONLY_CLEAN_CORRECT,
+            "max_targets": MAX_TARGETS,
+            "n_targets": int(targets.numel()),
+        },
+    }
+    write_json(os.path.join(run_dir, "config.json"), config)
+
+    metrics = {
+        "attack": "NettackLocal",
+        "model_name": MODEL_NAME,
+        "split": SPLIT,
+        "n_targets": int(targets.numel()),
+        "attempted_clean_correct": attempted,
+        "success": success,
+        "asr": asr,
+        "mean_confidence_drop_clean_correct": {"value": mean_drop, "n": conf_n},
+    }
+    write_json(os.path.join(run_dir, "metrics.json"), metrics)
+
+    print()
+
+    print(f"Saved to attacks/")
 
 
 if __name__ == "__main__":

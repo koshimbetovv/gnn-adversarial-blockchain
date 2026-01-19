@@ -1,0 +1,78 @@
+{
+  "attack": "FGSM",
+  "model_name": "gcn",
+  "split": "test",
+  "n_targets": 174,
+  "attack_mask_n": 174,
+  "asr": {
+    "value": 0.6091954022988506,
+    "success": 106,
+    "attempted": 174
+  },
+  "asr_pos_neg": {
+    "asr_pos": 0.6091954022988506,
+    "succ_pos": 106,
+    "attempted_pos": 174,
+    "asr_neg": 0.0,
+    "succ_neg": 0,
+    "attempted_neg": 0
+  },
+  "f1": {
+    "pos_clean": 0.514792899408284,
+    "pos_adv": 0.23859649122807017,
+    "macro_clean": 0.7477527945236175,
+    "macro_adv": 0.6066170861937452
+  },
+  "roc_auc": {
+    "clean": 0.8166446941636847,
+    "adv": 0.7731929069505189
+  },
+  "mean_confidence_drop": {
+    "value": 0.49908754229545593,
+    "n": 174
+  },
+  "clean_split_metrics": {
+    "split": "test",
+    "n_labeled": 8841,
+    "acc": 0.9629001244203145,
+    "precision_pos": 0.6492537313432836,
+    "recall_pos": 0.4264705882352941,
+    "f1_pos": 0.514792899408284,
+    "precision_macro": 0.8109793677129342,
+    "recall_macro": 0.7076619512977728,
+    "f1_macro": 0.7477527945236175,
+    "fraud_predictions": 268,
+    "confusion_matrix_2x2": [
+      [
+        8339,
+        94
+      ],
+      [
+        234,
+        174
+      ]
+    ]
+  },
+  "adv_split_metrics": {
+    "split": "test",
+    "n_labeled": 8841,
+    "acc": 0.950910530482977,
+    "precision_pos": 0.41975308641975306,
+    "recall_pos": 0.16666666666666666,
+    "f1_pos": 0.23859649122807017,
+    "precision_macro": 0.6902890331280699,
+    "recall_macro": 0.577759990513459,
+    "f1_macro": 0.6066170861937452,
+    "fraud_predictions": 162,
+    "confusion_matrix_2x2": [
+      [
+        8339,
+        94
+      ],
+      [
+        340,
+        68
+      ]
+    ]
+  }
+}
