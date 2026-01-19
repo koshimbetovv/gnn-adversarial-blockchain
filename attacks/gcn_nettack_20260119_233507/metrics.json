@@ -1,0 +1,13 @@
+{
+  "attack": "NettackLocal",
+  "model_name": "gcn",
+  "split": "test",
+  "n_targets": 4,
+  "attempted_clean_correct": 4,
+  "success": 4,
+  "asr": 1.0,
+  "mean_confidence_drop_clean_correct": {
+    "value": 0.7829359003349055,
+    "n": 4
+  }
+}
