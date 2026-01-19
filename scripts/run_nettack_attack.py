@@ -15,15 +15,18 @@ from src.utils.model_loader import load_model
 MODEL_NAME = "gcn"
 SPLIT = "test"
 #N_TARGETS = 3
-N_PERTURBATIONS = 5
+N_PERTURBATIONS = 3
 SAMPLE_SIZE = 50
 UNDIRECTED = False
 ALLOW_REMOVALS = False
+ATTACK_INCOMING = True   # IMPORTANT for directed graphs in PyG
+EARLY_STOP = True
+
 SEED = 0
 
 # ---------- target selection controls ----------
 ATTACK_ONLY_ILLICIT = True
-ATTACK_FRACTION = 0.1  # Between 0 and 1.0
+ATTACK_FRACTION = 0.02  # Between 0 and 1.0
 
 # Recommended for meaningful ASR (correct->wrong). You can still set False to sample broader targets.
 ONLY_CLEAN_CORRECT = True
@@ -77,8 +80,15 @@ def main():
     edge_index_base = data.edge_index.cpu()
 
     # IMPORTANT: don't reuse a shared mutable adj_list across targets.
-    atk = NettackLocalAttack(model, data, device, adj_list=None,
-                              undirected=UNDIRECTED, allow_removals=ALLOW_REMOVALS, seed=SEED)
+    atk = NettackLocalAttack(
+    model, data, device,
+    adj_list=None,
+    undirected=UNDIRECTED,
+    allow_removals=ALLOW_REMOVALS,
+    attack_incoming=ATTACK_INCOMING,   # <<< add
+    seed=SEED
+    )
+
 
     success = 0
     attempted = 0  # only clean-correct targets count as 'attempted' for ASR
@@ -86,7 +96,14 @@ def main():
     conf_n = 0
     for t in targets.tolist():
         is_clean_correct = bool(int(y_pred_clean[t].item()) == int(data.y[t].item()))
-        edge_adv = atk.attack(t, edge_index_base, n_perturbations=N_PERTURBATIONS, sample_size=SAMPLE_SIZE)
+        edge_adv = atk.attack(
+        t,
+        edge_index_base,
+        n_perturbations=N_PERTURBATIONS,
+        sample_size=SAMPLE_SIZE,
+        early_stop=EARLY_STOP,   # <<< add
+        )
+
 
         with torch.no_grad():
             pred_adv = int(model(data.x, edge_adv)[t].argmax().item())
