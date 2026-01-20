@@ -222,7 +222,9 @@ class GNIA(nn.Module):
                 # Update new_feat with discrete attributes
                 self.new_feat = torch.cat((self.feat, self.disc_feat.unsqueeze(0)), 0)
 
-            edge_values, edge_indices = self.score.topk(budget)
+            k = min(budget, self.score.size(0))
+            if k < 1: k = 1 # Avoid error if 0 candidates (though unlikely if checked)
+            edge_values, edge_indices = self.score.topk(k)
             self.disc_score = torch.zeros_like(self.score).to(self.device)
             self.disc_score[edge_indices]= 1.
 

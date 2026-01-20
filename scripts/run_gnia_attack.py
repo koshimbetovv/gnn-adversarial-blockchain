@@ -141,7 +141,9 @@ def train_gnia_multi(args, gnia_model, victim_model, data, target_indices, devic
     w1, w2 = w1.to(device), w2.to(device)
     W = torch.mm(w1, w2).t() 
     
-    for epoch in range(args.epochs):
+    from tqdm import tqdm
+    pbar = tqdm(range(args.epochs), desc="GNIA Optimization", leave=False, dynamic_ncols=True)
+    for epoch in pbar:
         optimizer.zero_grad()
         
         # Prepare Wlabel/Wsec

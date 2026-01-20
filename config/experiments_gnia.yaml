@@ -10,5 +10,5 @@ global:
 sweeps:
   - attack: gnia
     params:
-      BUDGET: [1, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
-      EPOCHS: [50]  # Fixed epochs
+      BUDGET: [1, 5, 10, 20, 30, 40, 50]
+      EPOCHS: [20]  # Fixed epochs

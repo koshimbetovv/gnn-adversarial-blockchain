@@ -169,13 +169,18 @@ def main():
         path = os.path.join(root, rel)
         modules[attack] = load_script_module(f"_run_{attack}", path)
 
+    from tqdm import tqdm
+    
+    tasks = []
     for sweep in sweeps:
         attack = str(sweep["attack"]).lower()
         if attack not in modules:
             raise ValueError(f"Unknown attack '{attack}'")
         
+        # Determine attack fraction specific to this sweep/attack
+        current_attack_dir_fraction = g_attack_fraction
         if attack == 'nettack':
-            g_attack_fraction = 0.2
+            current_attack_dir_fraction = 0.2
 
         if attack == 'pgd' or attack == 'fgsm':
             continue
@@ -186,22 +191,48 @@ def main():
         for model_name in models:
             for seed in seeds:
                 for combo in combos:
-                    overrides = {
-                        "MODEL_NAME": model_name,
-                        "SPLIT": g_split,
-                        "SEED": int(seed),
-                        "ATTACK_ONLY_ILLICIT": g_only_illicit,
-                        "ONLY_CLEAN_CORRECT": g_only_clean_correct,
-                        "ATTACK_FRACTION": g_attack_fraction,
-                    }
-                    overrides.update(combo)
-                    if attack == "pgd":
-                        overrides = normalize_pgd_params(overrides)
+                    tasks.append({
+                        "attack": attack,
+                        "model": model_name,
+                        "seed": seed,
+                        "combo": combo,
+                        "fraction": current_attack_dir_fraction
+                    })
 
-                    mod = modules[attack]
-                    filtered = {k: v for k, v in overrides.items() if hasattr(mod, k)}
-                    run_dir = run_one(mod, filtered)
-                    print(f"Done: {attack} {model_name} seed={seed} -> {os.path.relpath(run_dir, root)}")
+    pbar = tqdm(tasks, desc="Total Sweep Progress")
+    for task in pbar:
+        attack = task["attack"]
+        model_name = task["model"]
+        seed = int(task["seed"])
+        combo = task["combo"]
+        fraction = task["fraction"]
+
+        # Update description with relevant params (e.g. Budget)
+        desc_parts = [f"Running {model_name}"]
+        if "BUDGET" in combo:
+            desc_parts.append(f"Budget={combo['BUDGET']}")
+        elif "EPS" in combo:
+            desc_parts.append(f"Eps={combo['EPS']}")
+        pbar.set_description(" ".join(desc_parts))
+
+        overrides = {
+            "MODEL_NAME": model_name,
+            "SPLIT": g_split,
+            "SEED": seed,
+            "ATTACK_ONLY_ILLICIT": g_only_illicit,
+            "ONLY_CLEAN_CORRECT": g_only_clean_correct,
+            "ATTACK_FRACTION": fraction,
+        }
+        overrides.update(combo)
+        if attack == "pgd":
+            overrides = normalize_pgd_params(overrides)
+
+        mod = modules[attack]
+        filtered = {k: v for k, v in overrides.items() if hasattr(mod, k)}
+        
+        # Suppress inner output if needed, but keeping it for now allows seeing GNIA progress
+        run_dir = run_one(mod, filtered)
+        # print(f"Done: {attack} {model_name} seed={seed} -> {os.path.relpath(run_dir, root)}")
 
     summarize_attacks_to_csv(os.path.join(attacks_root(), "results_summary.csv"))
 

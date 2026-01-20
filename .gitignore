@@ -9,3 +9,4 @@ venv/
 results/
 __MACOSX/
 data/
+*.zip
