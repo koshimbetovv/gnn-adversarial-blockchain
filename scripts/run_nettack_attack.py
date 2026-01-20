@@ -50,7 +50,7 @@ def build_adj_list(edge_index, undirected):
 def make_run_dir(model_name: str):
     """Create attacks/model_YYYYMMDD_HHMMSS/ under repo root and return (run_dir, timestamp)."""
     repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+    ts = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
     run_dir = os.path.join(repo_root, "attacks", f"{model_name}_nettack_{ts}")
     os.makedirs(run_dir, exist_ok=False)
     return run_dir, ts

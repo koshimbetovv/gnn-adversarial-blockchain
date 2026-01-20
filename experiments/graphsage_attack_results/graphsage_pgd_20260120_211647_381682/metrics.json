@@ -1,0 +1,78 @@
+{
+  "attack": "PGD",
+  "model_name": "graphsage",
+  "split": "test",
+  "n_targets": 183,
+  "attack_mask_n": 183,
+  "asr": {
+    "value": 0.8524590163934426,
+    "success": 156,
+    "attempted": 183
+  },
+  "asr_pos_neg": {
+    "asr_pos": 0.8524590163934426,
+    "succ_pos": 156,
+    "attempted_pos": 183,
+    "asr_neg": 0.0,
+    "succ_neg": 0,
+    "attempted_neg": 0
+  },
+  "f1": {
+    "pos_clean": 0.5754716981132075,
+    "pos_adv": 0.1125,
+    "macro_clean": 0.779816102488494,
+    "macro_adv": 0.5438677188698988
+  },
+  "roc_auc": {
+    "clean": 0.8480425580643736,
+    "adv": 0.8081531646217126
+  },
+  "mean_confidence_drop": {
+    "value": 0.6741736531257629,
+    "n": 183
+  },
+  "clean_split_metrics": {
+    "split": "test",
+    "n_labeled": 8841,
+    "acc": 0.9694604682728198,
+    "precision_pos": 0.8026315789473685,
+    "recall_pos": 0.4485294117647059,
+    "f1_pos": 0.5754716981132075,
+    "precision_macro": 0.8882541384809988,
+    "recall_macro": 0.7215966162345407,
+    "f1_macro": 0.779816102488494,
+    "fraud_predictions": 228,
+    "confusion_matrix_2x2": [
+      [
+        8388,
+        45
+      ],
+      [
+        225,
+        183
+      ]
+    ]
+  },
+  "adv_split_metrics": {
+    "split": "test",
+    "n_labeled": 8841,
+    "acc": 0.9518154054971157,
+    "precision_pos": 0.375,
+    "recall_pos": 0.0661764705882353,
+    "f1_pos": 0.1125,
+    "precision_macro": 0.6657757440985289,
+    "recall_macro": 0.5304201456463055,
+    "f1_macro": 0.5438677188698988,
+    "fraud_predictions": 72,
+    "confusion_matrix_2x2": [
+      [
+        8388,
+        45
+      ],
+      [
+        381,
+        27
+      ]
+    ]
+  }
+}

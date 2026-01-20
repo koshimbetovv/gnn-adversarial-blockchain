@@ -1,0 +1,117 @@
+{
+  "attack": "NodeInjectionEvasion",
+  "model_name": "gat",
+  "split": "test",
+  "n_targets": 207,
+  "injection": {
+    "n_injected_nodes": 5,
+    "edges_added": 5,
+    "injected_node_ids": [
+      203769,
+      203770,
+      203771,
+      203772,
+      203773
+    ],
+    "injected_edges": [
+      [
+        203769,
+        45762
+      ],
+      [
+        203770,
+        43752
+      ],
+      [
+        203771,
+        43738
+      ],
+      [
+        203772,
+        43930
+      ],
+      [
+        203773,
+        45173
+      ]
+    ]
+  },
+  "f1": {
+    "pos_clean": 0.5914285714285714,
+    "pos_adv": 0.5833333333333334,
+    "macro_clean": 0.7872936049935225,
+    "macro_adv": 0.7831302248910867
+  },
+  "roc_auc": {
+    "clean": 0.8760858369198504,
+    "adv": 0.8757620622065974
+  },
+  "asr": {
+    "attacked": {
+      "value": 0.01932367149758454,
+      "success": 4,
+      "attempted": 207
+    },
+    "split": {
+      "value": 0.000467562828755114,
+      "success": 4,
+      "attempted": 8555
+    },
+    "pos_neg_on_attacked": {
+      "asr_pos": 0.01932367149758454,
+      "succ_pos": 4,
+      "attempted_pos": 207,
+      "asr_neg": 0.0,
+      "succ_neg": 0,
+      "attempted_neg": 0
+    }
+  },
+  "mean_confidence_drop": {
+    "value": 0.01582401618361473,
+    "n": 207
+  },
+  "clean_split_metrics": {
+    "split": "test",
+    "n_labeled": 8841,
+    "acc": 0.9676507182445425,
+    "precision_pos": 0.708904109589041,
+    "recall_pos": 0.5073529411764706,
+    "f1_pos": 0.5914285714285714,
+    "precision_macro": 0.842696293886812,
+    "recall_macro": 0.7486367456979235,
+    "f1_macro": 0.7872936049935225,
+    "fraud_predictions": 292,
+    "confusion_matrix_2x2": [
+      [
+        8348,
+        85
+      ],
+      [
+        201,
+        207
+      ]
+    ]
+  },
+  "adv_split_metrics": {
+    "split": "test",
+    "n_labeled": 8841,
+    "acc": 0.9671982807374732,
+    "precision_pos": 0.7048611111111112,
+    "recall_pos": 0.49754901960784315,
+    "f1_pos": 0.5833333333333334,
+    "precision_macro": 0.8404464564090572,
+    "recall_macro": 0.7437347849136098,
+    "f1_macro": 0.7831302248910867,
+    "fraud_predictions": 288,
+    "confusion_matrix_2x2": [
+      [
+        8348,
+        85
+      ],
+      [
+        205,
+        203
+      ]
+    ]
+  }
+}

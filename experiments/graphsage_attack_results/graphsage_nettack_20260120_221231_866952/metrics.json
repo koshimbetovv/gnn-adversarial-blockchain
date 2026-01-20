@@ -1,0 +1,13 @@
+{
+  "attack": "NettackLocal",
+  "model_name": "graphsage",
+  "split": "test",
+  "n_targets": 37,
+  "attempted_clean_correct": 37,
+  "success": 36,
+  "asr": 0.972972972972973,
+  "mean_confidence_drop_clean_correct": {
+    "value": 0.814612695482635,
+    "n": 37
+  }
+}
