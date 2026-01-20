@@ -1,0 +1,28 @@
+{
+  "timestamp": "20260120_201745_800186",
+  "attack": "NodeInjectionEvasion",
+  "model_name": "gat",
+  "split": "test",
+  "device": "mps",
+  "attack_params": {
+    "n_inject": 5,
+    "edges_per_injected": 10,
+    "eps": 0.05,
+    "alpha": 0.01,
+    "steps": 30,
+    "random_start": true,
+    "init": "mean",
+    "clamp": null,
+    "targeted": false,
+    "target_label": 0,
+    "early_stop": true,
+    "connect_strategy": "round_robin",
+    "seed": 0
+  },
+  "target_selection": {
+    "attack_only_illicit": true,
+    "attack_fraction": 1.0,
+    "only_clean_correct": true,
+    "n_targets": 207
+  }
+}

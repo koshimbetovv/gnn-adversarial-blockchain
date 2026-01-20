@@ -1,0 +1,172 @@
+{
+  "attack": "MonTiOneTimeInjectionAttack (practical adaptation)",
+  "model_name": "graphsage",
+  "split": "test",
+  "n_targets": 183,
+  "injection": {
+    "n_injected_nodes": 5,
+    "edges_added": 20,
+    "injected_node_ids": [
+      203769,
+      203770,
+      203771,
+      203772,
+      203773
+    ],
+    "injected_edges": [
+      [
+        203769,
+        42913
+      ],
+      [
+        203770,
+        42913
+      ],
+      [
+        203771,
+        42913
+      ],
+      [
+        203772,
+        42913
+      ],
+      [
+        203773,
+        42913
+      ],
+      [
+        203770,
+        203773
+      ],
+      [
+        203773,
+        203770
+      ],
+      [
+        203769,
+        203772
+      ],
+      [
+        203772,
+        203769
+      ],
+      [
+        203770,
+        203769
+      ],
+      [
+        203770,
+        203772
+      ],
+      [
+        203773,
+        203769
+      ],
+      [
+        203773,
+        203772
+      ],
+      [
+        203769,
+        203770
+      ],
+      [
+        203769,
+        203773
+      ],
+      [
+        203772,
+        203770
+      ],
+      [
+        203772,
+        203773
+      ],
+      [
+        203770,
+        203771
+      ],
+      [
+        203771,
+        203770
+      ],
+      [
+        203771,
+        203773
+      ]
+    ]
+  },
+  "f1": {
+    "pos_clean": 0.5754716981132075,
+    "pos_adv": 0.5754716981132075,
+    "macro_clean": 0.779816102488494,
+    "macro_adv": 0.779816102488494
+  },
+  "roc_auc": {
+    "clean": 0.8480425580643736,
+    "adv": 0.8480413954980782
+  },
+  "asr": {
+    "attacked": {
+      "value": 0.0,
+      "success": 0,
+      "attempted": 183
+    },
+    "pos_neg_on_attacked": {
+      "asr_pos": 0.0,
+      "succ_pos": 0,
+      "attempted_pos": 183,
+      "asr_neg": 0.0,
+      "succ_neg": 0,
+      "attempted_neg": 0
+    }
+  },
+  "mean_confidence_drop": {
+    "value": 0.00023860846704337746,
+    "n": 183
+  },
+  "clean_split_metrics": {
+    "split": "test",
+    "n_labeled": 8841,
+    "acc": 0.9694604682728198,
+    "precision_pos": 0.8026315789473685,
+    "recall_pos": 0.4485294117647059,
+    "f1_pos": 0.5754716981132075,
+    "precision_macro": 0.8882541384809988,
+    "recall_macro": 0.7215966162345407,
+    "f1_macro": 0.779816102488494,
+    "fraud_predictions": 228,
+    "confusion_matrix_2x2": [
+      [
+        8388,
+        45
+      ],
+      [
+        225,
+        183
+      ]
+    ]
+  },
+  "adv_split_metrics": {
+    "split": "test",
+    "n_labeled": 8841,
+    "acc": 0.9694604682728198,
+    "precision_pos": 0.8026315789473685,
+    "recall_pos": 0.4485294117647059,
+    "f1_pos": 0.5754716981132075,
+    "precision_macro": 0.8882541384809988,
+    "recall_macro": 0.7215966162345407,
+    "f1_macro": 0.779816102488494,
+    "fraud_predictions": 228,
+    "confusion_matrix_2x2": [
+      [
+        8388,
+        45
+      ],
+      [
+        225,
+        183
+      ]
+    ]
+  }
+}

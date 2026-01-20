@@ -1,0 +1,35 @@
+{
+  "timestamp": "20260120_211326_922245",
+  "attack": "MonTiOneTimeInjectionAttack (practical adaptation)",
+  "model_name": "gat",
+  "split": "test",
+  "device": "mps",
+  "target_selection": {
+    "attack_only_illicit": true,
+    "attack_fraction": 1.0,
+    "only_clean_correct": true,
+    "n_targets": 207
+  },
+  "budgets": {
+    "n_inject": 10,
+    "edge_budget": 100
+  },
+  "candidates": {
+    "K_hop": 2,
+    "alpha": 500,
+    "neighbor_mode": "undirected"
+  },
+  "opt": {
+    "eps": 0.05,
+    "alpha_step": 0.01,
+    "inner_steps": 30,
+    "outer_rounds": 3
+  },
+  "graph": {
+    "undirected": false,
+    "attack_incoming": true
+  },
+  "desired_label": 0,
+  "clamp": null,
+  "seed": 0
+}
