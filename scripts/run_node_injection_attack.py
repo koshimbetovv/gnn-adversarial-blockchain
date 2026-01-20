@@ -55,7 +55,7 @@ def get_device():
 
 def make_run_dir(model_name: str):
     repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+    ts = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
     run_dir = os.path.join(repo_root, "attacks", f"{model_name}_node_injection_{ts}")
     os.makedirs(run_dir, exist_ok=False)
     return run_dir, ts
