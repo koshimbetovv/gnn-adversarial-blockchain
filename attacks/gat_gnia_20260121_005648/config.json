@@ -1,0 +1,19 @@
+{
+  "timestamp": "20260121_005648",
+  "attack": "GNIA",
+  "model_name": "gat",
+  "split": "test",
+  "params": {
+    "lr": 0.01,
+    "epochs": 50,
+    "budget": 5,
+    "gnia_attr_tau": 1.0,
+    "gnia_edge_tau": 1.0
+  },
+  "metrics": {
+    "clean_f1": 0.7872936049935225,
+    "adv_f1": 0.7862570977945883,
+    "asr_attacked": 0.004830917874396135,
+    "asr_split": 0.0001168907071887785
+  }
+}

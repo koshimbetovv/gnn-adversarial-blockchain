@@ -26,15 +26,21 @@ class GCN(nn.Module):
         # last
         self.convs.append(GCNConv(hidden_dim, out_dim))
 
-    def forward(self, x, edge_index):
+    def forward(self, x, edge_index, edge_weight=None):
         # all but last layer
         for i in range(len(self.convs) - 1):
-            x = self.convs[i](x, edge_index)
+            if edge_weight is not None:
+                x = self.convs[i](x, edge_index, edge_weight=edge_weight)
+            else:
+                x = self.convs[i](x, edge_index)
             if self.use_norm:
                 x = self.norms[i](x)
             x = F.relu(x)
             x = F.dropout(x, p=self.dropout, training=self.training)
 
         # last layer (logits)
-        x = self.convs[-1](x, edge_index)
+        if edge_weight is not None:
+            x = self.convs[-1](x, edge_index, edge_weight=edge_weight)
+        else:
+            x = self.convs[-1](x, edge_index)
         return x

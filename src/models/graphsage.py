@@ -8,7 +8,7 @@ class GraphSAGE(nn.Module):
         self.conv1 = SAGEConv(in_dim, hid_dim, aggr=aggr)
         self.conv2 = SAGEConv(hid_dim, out_dim, aggr=aggr)
 
-    def forward(self, x, edge_index):
+    def forward(self, x, edge_index, **kwargs):
         x = F.relu(self.conv1(x, edge_index))
         x = self.conv2(x, edge_index)
         return x

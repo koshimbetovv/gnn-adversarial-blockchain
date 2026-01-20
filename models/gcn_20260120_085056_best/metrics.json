@@ -1,0 +1,24 @@
+{
+  "test": {
+    "split": "test",
+    "n_labeled": 8841,
+    "acc": 0.9436715303698676,
+    "precision_pos": 0.4066390041493776,
+    "recall_pos": 0.4803921568627451,
+    "f1_pos": 0.4404494382022472,
+    "precision_macro": 0.6906385593781941,
+    "recall_macro": 0.7232388864474997,
+    "f1_macro": 0.7053962293440964,
+    "fraud_predictions": 482,
+    "confusion_matrix_2x2": [
+      [
+        8147,
+        286
+      ],
+      [
+        212,
+        196
+      ]
+    ]
+  }
+}

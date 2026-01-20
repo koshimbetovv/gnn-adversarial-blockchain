@@ -73,7 +73,7 @@ class GAT(nn.Module):
             )
         )
 
-    def forward(self, x, edge_index):
+    def forward(self, x, edge_index, **kwargs):
         # feature dropout at input (as in GAT paper)
         x = F.dropout(x, p=self.dropout, training=self.training)
 

@@ -1,0 +1,22 @@
+{
+    "model": {
+        "hidden_dim": 128,
+        "num_layers": 2,
+        "dropout": 0.28160250828309735,
+        "out_dim": 2
+    },
+    "training": {
+        "epochs": 100,
+        "lr": 0.027383840947491026,
+        "weight_decay": 0.0016717365113028332,
+        "grad_clip": 0.0746770685088684,
+        "adam_eps": 0.00001,
+        "log_every": 50,
+        "patience": 100
+    },
+    "save": {
+        "save_dir": "models",
+        "save_run": true,
+        "filename": "gcn.pt"
+    }
+}

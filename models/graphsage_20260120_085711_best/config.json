@@ -1,0 +1,21 @@
+{
+    "model": {
+        "hidden_dim": 128,
+        "aggr": "mean",
+        "out_dim": 2
+    },
+    "training": {
+        "epochs": 100,
+        "lr": 0.021194973090785822,
+        "weight_decay": 0.000021101580330612497,
+        "grad_clip": 0.0037380575809966288,
+        "adam_eps": 0.00001,
+        "log_every": 50,
+        "patience": 100
+    },
+    "save": {
+        "save_dir": "models",
+        "save_run": true,
+        "filename": "graphsage.pt"
+    }
+}
