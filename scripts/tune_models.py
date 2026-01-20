@@ -158,7 +158,14 @@ def main():
     )
     
     print(f"Starting tuning for {args.model} with {args.n_trials} trials...")
-    study.optimize(lambda trial: objective(trial, args), n_trials=args.n_trials)
+    
+    from tqdm import tqdm
+    with tqdm(total=args.n_trials, desc="Tuning Progress") as pbar:
+        def progress_clbk(study, trial):
+            pbar.update(1)
+            pbar.set_postfix({"Best F1": f"{study.best_value:.4f}"})
+            
+        study.optimize(lambda trial: objective(trial, args), n_trials=args.n_trials, callbacks=[progress_clbk])
     
     print("\n=== Tuning Complete ===")
     print(f"Best trial: {study.best_trial.number}")
