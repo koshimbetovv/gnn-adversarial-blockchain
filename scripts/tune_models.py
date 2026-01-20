@@ -40,6 +40,9 @@ def suggest_params(trial, model_name):
     label_smoothing = trial.suggest_float("label_smoothing", 0.0, 0.2)
     args.extend(["--label_smoothing", str(label_smoothing)])
 
+    # Patience: fixed 100
+    args.extend(["--patience", "100"])
+
     # Model specific
     if model_name in ["gat", "gcn"]:
         # Dropout: uniform [0.0, 0.7]
@@ -114,9 +117,14 @@ def objective(trial, args):
         with open(results_file, "r") as f:
             for line in f:
                 try:
-                    data = json.loads(line)
+                    data = json.loads(line.strip())
                     if str(data.get("trial_id")) == str(trial.number):
                         val_f1 = data.get("val_macro_f1")
+                        
+                        # Store ALL fields as user_attrs (except trial_id which is implicit)
+                        for k, v in data.items():
+                            if k != "trial_id":
+                                trial.set_user_attr(k, v)
                         break
                 except:
                     continue

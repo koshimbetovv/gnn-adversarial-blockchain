@@ -302,7 +302,10 @@ def main():
             "optimizer": args.optimizer,
             "scheduler": args.scheduler,
             "grad_clip": args.grad_clip_norm,
-            "label_smoothing": args.label_smoothing
+            "grad_clip": args.grad_clip_norm,
+            "label_smoothing": args.label_smoothing,
+            "epochs": args.epochs,
+            "patience": args.patience
         }
         with open(args.results_file, "a") as f:
             f.write(json.dumps(result_entry) + "\n")
