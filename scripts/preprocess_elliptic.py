@@ -1,5 +1,6 @@
 import pandas as pd
 import torch
+import numpy as np
 from sklearn.preprocessing import StandardScaler
 
 def main():
@@ -8,20 +9,20 @@ def main():
     edges = pd.read_csv("data/raw/elliptic/elliptic_txs_edgelist.csv")
 
     features = features.sort_values(by=0)
-    import numpy as np
-
+    
     # timestep is 2nd column (index 1) in elliptic_txs_features.csv
     t = features.iloc[:, 1].astype(int).values
 
     # Two-way split:
-    # train: 1-41, test: 42-49
-    train_mask = torch.tensor((t >= 1) & (t <= 41), dtype=torch.bool)
-    test_mask  = torch.tensor((t >= 42) & (t <= 49), dtype=torch.bool)
+    # train: 1-k, test: (k+1)-49
+    k = 34
+    train_mask = torch.tensor((t >= 1) & (t <= k), dtype=torch.bool)
+    test_mask  = torch.tensor((t >= (k + 1)) & (t <= 49), dtype=torch.bool)
 
     x = features.iloc[:, 2:].values.astype("float32")
 
     # scaler must fit on TRAIN ONLY
-    train_mask_np = (t >= 1) & (t <= 41)
+    train_mask_np = (t >= 1) & (t <= k)
 
     scaler = StandardScaler()
     scaler.fit(x[train_mask_np])   # fit ONLY on train
@@ -55,6 +56,7 @@ def main():
         "x": torch.tensor(x, dtype=torch.float),
         "y": torch.tensor(y, dtype=torch.long),
         "edge_index": edge_index,
+        "time_step": torch.tensor(t, dtype=torch.long),
         "train_mask": train_mask,
         "test_mask": test_mask,
     },

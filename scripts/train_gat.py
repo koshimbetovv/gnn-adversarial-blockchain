@@ -15,10 +15,10 @@ from src.models.gat import GAT
 
 CONFIG = {
     "model": {
-        "hidden_dim": 32,
-        "num_layers": 2,
+        "hidden_dim": 128,
+        "num_layers": 4,
         "heads": 4,
-        "dropout": 0.6,
+        "dropout": 0.2,
         "out_dim": 2,
         "use_norm": True,
     },

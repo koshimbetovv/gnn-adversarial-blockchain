@@ -12,7 +12,7 @@ class EllipticDataset:
         )
 
         # attach masks if present
-        for k in ["train_mask", "test_mask"]:
+        for k in ["train_mask", "test_mask", "time_step"]:
             if k in obj:
                 setattr(self.data, k, obj[k])
 

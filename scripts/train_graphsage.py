@@ -15,12 +15,12 @@ from src.models.graphsage import GraphSAGE
 
 CONFIG = {
     "model": {
-        "hidden_dim": 64,
+        "hidden_dim": 128,
         "aggr": "mean",   # "mean" | "max" | "sum"
         "out_dim": 2,
     },
     "training": {
-        "epochs": 100,
+        "epochs": 500,
         "lr": 0.005,
         "weight_decay": 5e-4,
         "grad_clip": 1.0,

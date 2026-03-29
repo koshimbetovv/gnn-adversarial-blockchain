@@ -5,14 +5,12 @@ import torch
 from src.models.gcn import GCN
 from src.models.graphsage import GraphSAGE
 from src.models.gat import GAT
+from src.models.chronowave_gnn import ChronoWaveGNN
+from src.models.recgnn import RecGNN
+from src.models.cosemignn import CoSemiGNN
 
-
-# ---------- helpers: checkpoint discovery ----------
 
 def _list_run_dirs(model_dir: str, model_name: str):
-    """
-    Returns run dirs like models/gcn_YYYYMMDD_HHMMSS that contain model.pt
-    """
     prefix = f"{model_name}_"
     if not os.path.isdir(model_dir):
         return []
@@ -28,22 +26,13 @@ def _list_run_dirs(model_dir: str, model_name: str):
 
 
 def _pick_latest_run_dir(run_dirs):
-    """
-    Your naming YYYYMMDD_HHMMSS sorts lexicographically correctly.
-    """
     if not run_dirs:
         return None
-    # sort by folder name (timestamp) rather than mtime for reproducibility
     run_dirs = sorted(run_dirs, key=lambda p: os.path.basename(p))
     return run_dirs[-1]
 
 
 def resolve_checkpoint(model_name: str, model_dir: str = "models", run_id: str | None = None):
-    """
-    Returns (checkpoint_path, run_dir).
-    If run_id is None -> choose latest run dir.
-    If run_id is provided -> use models/{model_name}_{run_id}/model.pt
-    """
     if run_id is not None:
         run_dir = os.path.join(model_dir, f"{model_name}_{run_id}")
         ckpt = os.path.join(run_dir, "model.pt")
@@ -62,12 +51,7 @@ def resolve_checkpoint(model_name: str, model_dir: str = "models", run_id: str |
     return os.path.join(run_dir, "model.pt"), run_dir
 
 
-# ---------- helpers: config loading ----------
-
 def _load_run_config(run_dir: str):
-    """
-    configs are stored ONLY in run_dir/config.json
-    """
     cfg_path = os.path.join(run_dir, "config.json")
     if not os.path.exists(cfg_path):
         return None
@@ -76,10 +60,6 @@ def _load_run_config(run_dir: str):
 
 
 def _load_yaml_config(config_dir: str, model_name: str):
-    """
-    Fallback: reads config/models/{model}.yaml if present.
-    Supports either {"model": {...}} or flat keys.
-    """
     try:
         import yaml
     except Exception:
@@ -92,29 +72,12 @@ def _load_yaml_config(config_dir: str, model_name: str):
     with open(path, "r") as f:
         cfg = yaml.safe_load(f) or {}
 
-    # support both schemas
     if "model" in cfg and isinstance(cfg["model"], dict):
         return cfg
-    # wrap flat schema
     return {"model": cfg, "training": cfg.get("training", {})}
 
 
-def _get_param(cfg: dict, path: list, default):
-    cur = cfg
-    for k in path:
-        if not isinstance(cur, dict) or k not in cur:
-            return default
-        cur = cur[k]
-    return cur
-
-
-# ---------- model factory ----------
-
 def build_model(model_name: str, num_features: int, num_classes: int, cfg: dict):
-    """
-    Create model architecture from cfg.
-    cfg is expected to have cfg["model"][...] (preferred).
-    """
     m = cfg.get("model", {}) if isinstance(cfg, dict) else {}
 
     if model_name == "gcn":
@@ -128,10 +91,9 @@ def build_model(model_name: str, num_features: int, num_classes: int, cfg: dict)
         )
 
     if model_name == "graphsage":
-        m = cfg.get("model", {}) if isinstance(cfg, dict) else {}
         return GraphSAGE(
             in_dim=num_features,
-            hid_dim=int(m.get("hidden_dim", 64)),  # keep config key "hidden_dim"
+            hid_dim=int(m.get("hidden_dim", 64)),
             out_dim=num_classes,
             aggr=m.get("aggr", "mean"),
         )
@@ -147,10 +109,47 @@ def build_model(model_name: str, num_features: int, num_classes: int, cfg: dict)
             use_norm=bool(m.get("use_norm", True)),
         )
 
-    raise ValueError(f"Unknown model: {model_name}. Choose from 'gcn', 'graphsage', 'gat'.")
+    if model_name == "chronowave_gnn":
+        return ChronoWaveGNN(
+            in_dim=num_features,
+            hidden_dim=int(m.get("hidden_dim", 128)),
+            out_dim=num_classes,
+            time_dim=int(m.get("time_dim", 8)),
+            heads=int(m.get("heads", 4)),
+            num_layers=int(m.get("num_layers", 3)),
+            dropout=float(m.get("dropout", 0.4)),
+            wavelet_level=int(m.get("wavelet_level", 2)),
+        )
 
+    if model_name == "recgnn":
+        state_rows = m.get("state_rows", None)
+        if state_rows is None:
+            raise ValueError(
+                "RecGNN checkpoints now require model.state_rows in config.json because the paper model "
+                "is sequence-based over variable-size timestep graphs."
+            )
+        return RecGNN(
+            in_dim=num_features,
+            hidden_dim=int(m.get("hidden_dim", 50)),
+            out_dim=num_classes,
+            state_rows=int(state_rows),
+            dropout=float(m.get("dropout", 0.5)),
+        )
 
-# ---------- public API ----------
+    if model_name == "cosemignn":
+        return CoSemiGNN(
+        feature_in=num_features,
+        dim=int(m.get("dim", 128)),
+        dim2=int(m.get("dim2", 256)),
+        dim3=int(m.get("dim3", 128)),
+        num_heads=int(m.get("num_heads", 4)),
+    )
+
+    raise ValueError(
+        f"Unknown model: {model_name}. Choose from 'gcn', 'graphsage', 'gat', "
+        f"'chronowave_gnn', 'recgnn', 'cosemignn'."
+    )
+
 
 def load_model(
     model_name: str,
@@ -161,34 +160,17 @@ def load_model(
     config_dir: str = "config/models",
     run_id: str | None = None,
 ):
-    """
-    Loads the latest run by default:
-      models/{model_name}_YYYYMMDD_HHMMSS/model.pt
-
-    If run_id is provided:
-      models/{model_name}_{run_id}/model.pt
-
-    Rebuilds the architecture from:
-      1) run_dir/metrics.json (preferred: contains "config")
-      2) run_dir/config.json (optional)
-      3) config/models/{model_name}.yaml (fallback)
-      4) defaults (last resort)
-    """
     model_name = model_name.lower()
     ckpt_path, run_dir = resolve_checkpoint(model_name, model_dir=model_dir, run_id=run_id)
 
     cfg = _load_run_config(run_dir)
     if cfg is None:
         ycfg = _load_yaml_config(config_dir, model_name)
-        if ycfg is None:
-            cfg = {"model": {}, "training": {}}
-        else:
-            cfg = ycfg
+        cfg = ycfg if ycfg is not None else {"model": {}, "training": {}}
 
     model = build_model(model_name, num_features, num_classes, cfg)
     state = torch.load(ckpt_path, map_location=device)
     model.load_state_dict(state)
-
     model.to(device)
     model.eval()
 
@@ -214,7 +196,7 @@ def load_all_models(
                 device=device,
                 model_dir=model_dir,
                 config_dir=config_dir,
-                run_id=None,  # latest
+                run_id=None,
             )
         except FileNotFoundError as e:
             print(f"⚠ {e}")

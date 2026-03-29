@@ -8,3 +8,6 @@ __pycache__/
 results/
 __MACOSX/
 data/
+experiments/
+attacks/
+models/

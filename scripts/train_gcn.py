@@ -17,11 +17,11 @@ CONFIG = {
     "model": {
         "hidden_dim": 128,
         "num_layers": 2,
-        "dropout": 0.6,
+        "dropout": 0.4,
         "out_dim": 2,
     },
     "training": {
-        "epochs": 100,
+        "epochs": 1500,
         "lr": 0.005,
         "weight_decay": 5e-4,
         "grad_clip": 1.0,

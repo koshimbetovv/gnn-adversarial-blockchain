@@ -18,3 +18,7 @@ networkx
 
 # Plotting (used by scripts/evaluate_models.py)
 matplotlib
+
+torch-geometric-temporal
+xgboost
+PyWavelets
