@@ -10,4 +10,4 @@ __MACOSX/
 data/
 experiments/
 attacks/
-models/
+/models/
